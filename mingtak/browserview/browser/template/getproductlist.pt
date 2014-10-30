@@ -1,0 +1,33 @@
+<!Doctype html>
+<html>
+<body>
+
+
+
+<h1 tal:content="string:Product List, catalog: ${context/REQUEST/catalog}">Title</h1>
+<tal:catalog define="catalog python:context.portal_catalog;
+                     brain python:catalog({'Subject':context.REQUEST['catalog']},
+                                          sort_on='discount', sort_order='reverse')[0:];
+                     randomList python:modules['random'].shuffle(brain)">
+  <ol>
+    <tal:repeat repeat="item brain">
+      <li>
+        <a tal:attributes="href item/getURL" tal:define="obj item/getObject" target="_blank">
+          <img tal:replace="structure obj/@@images/productImage/mini" />
+        </a>
+        <span tal:content="string:imageSize:${item/imageSize} || 
+                                  discount:${item/discount} || 
+                                  aspectRatio:${item/aspectRatio} ||
+                                  productName:${item/Title}"/>
+      </li>
+      <p tal:content="string:網址: ${item/getURL}" />
+      <p tal:content="structure string:商品描述: ${item/Description}" />
+<hr>
+    </tal:repeat>
+  </ol>
+</tal:catalog>
+
+
+
+</body>
+</html>

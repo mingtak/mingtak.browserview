@@ -1,0 +1,15 @@
+<h1>Get Onsale Data</h1>
+<tal:catalog define="catalog python:context.portal_catalog;
+                     brain python:catalog({'discount':{'query':0.1, 'range':'min'}}, sort_on='imageSize', sort_order='reverse')">
+  <ul>
+    <tal:repeat repeat="item brain">
+      <li>
+        <a tal:attributes="href item/getURL" tal:define="obj item/getObject" target="_blank">
+          <img tal:replace="structure obj/@@images/productImage/tile" />
+        </a>
+        <span tal:content="python:'imageSize: %sk || discount: %s %%off || aspectRatio: %s || productName: %s' %
+                                   (item.imageSize/1024, int(item.discount*100), item.aspectRatio, item.id,)" />
+      </li>
+    </tal:repeat>
+  </ul>
+</tal:catalog>

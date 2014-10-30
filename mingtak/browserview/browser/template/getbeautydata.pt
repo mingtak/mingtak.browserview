@@ -1,0 +1,24 @@
+<!Doctype html>
+<html>
+<body>
+
+
+<h1>Get Beauty Data ('cosmetics', 'personalcare', 'fragrance')</h1>
+<tal:catalog define="catalog python:context.portal_catalog;
+                     brain python:catalog({'Subject':['cosmetics', 'personalcare', 'fragrance']},
+                                          sort_on='imageSize', sort_order='reverse')">
+  <ol>
+    <tal:repeat repeat="item brain">
+      <li>
+        <a tal:attributes="href item/getURL" tal:define="obj item/getObject" target="_blank">
+          <img tal:replace="structure obj/@@images/productImage/mini" />
+        </a>
+        <span tal:content="python:'imageSize: %sk || discount: %s || aspectRatio: %s || productName: %s' %
+                                   (item.imageSize/1024, item.discount, item.aspectRatio, item.id)" />
+      </li>
+    </tal:repeat>
+  </ol>
+</tal:catalog>
+
+</body>
+</html>

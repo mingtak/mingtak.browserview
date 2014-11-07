@@ -1,33 +1,71 @@
 <!Doctype html>
 <html>
+<head>
+
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+<script type="text/javascript" language="javascript"> google.load("jquery", "1.7"); </script>
+</head>
 <body>
 
-
-
-<h1 tal:content="string:Product List, catalog: ${context/REQUEST/catalog}">Title</h1>
+<!-- total -->
 <tal:catalog define="catalog python:context.portal_catalog;
-                     brain python:catalog({'Subject':context.REQUEST['catalog']},
-                                          sort_on='discount', sort_order='reverse')[0:];
-                     randomList python:modules['random'].shuffle(brain)">
+                     end python:modules['DateTime'].DateTime() + 0.1;
+                     start python:modules['DateTime'].DateTime() - 3;
+                     date_range_query python:{'query':(start,end), 'range':'min:max'};
+                     brain python:catalog({'portal_type':'cj.product.cjproduct',
+                                           'created':date_range_query,
+                                           'review_state':request.get('state', 'private')},
+                                          sort_on='created', sort_order='reverse')[int(request.get('start',0)) : int(request.get('start',0))+100];">
+<!--                     randomList python:modules['random'].shuffle(brain)">
+-->
+<h2 tal:content="python:'開始項次： %s' % request.get('start', 0)" />
+<a tal:attributes="href python:'?start=%s&state=%s' %
+                                    ((int(request.get('start', 0))-100) if int(request.get('start', 0))>100 else 0,
+                                      request.get('state', 'private'))">上一頁</a>
+<a tal:attributes="href python:'?start=%s&state=%s' %
+                                    (int(request.get('start', 0))+100, request.get('state', 'private'))">下一頁</a>
+<hr>
   <ol>
     <tal:repeat repeat="item brain">
       <li>
-        <a tal:attributes="href item/getURL" tal:define="obj item/getObject" target="_blank">
+        <a tal:attributes="href item/getURL" tal:define="obj item/getObject" target="_blank" style="float:left">
           <img tal:replace="structure obj/@@images/productImage/mini" />
         </a>
-        <span tal:content="string:imageSize:${item/imageSize} || 
-                                  discount:${item/discount} || 
-                                  aspectRatio:${item/aspectRatio} ||
-                                  productName:${item/Title}"/>
-      </li>
-      <p tal:content="string:網址: ${item/getURL}" />
+
+
+
+
+<p tal:define="id python:item.id.replace('.', '')"
+   tal:replace="structure string:${view/scriptStr_1}${id}${view/scriptStr_2}${id}${view/scriptStr_3}${item/id}${view/scriptStr_4}" />
+
+        <p>
+          <span tal:content="string:狀態:${item/review_state}" style="color:blue"
+                tal:attributes="id python:item.id.replace('.', '');
+                                style python:'color:%s' % ('green' if item.review_state == 'published' else 'red')" />
+          <span tal:content="python:'分類: %s' % str(item.Subject)" style="color:blue" />
+        </p>
+
+      <p tal:content="string:廠商分類: ${item/advertiserCategory}" />
+      <p tal:content="python:'關鍵字: %s' % str(item.getObject().keywords)" />
       <p tal:content="structure string:商品描述: ${item/Description}" />
+      <p><a target="_blank" tal:attributes="href string:${item/getURL}/edit">點此修正內容</a> ||
+         <a target="_blank" tal:attributes="href item/buyUrl">產品官網網址</a> ||
+         <span tal:content="python:'匯入時間: %s' % str(item.created).split('.')[0]" />
+      </p>
+
+
+        <span tal:content="python:'產品名稱: %s || 照片大小: %s k || 影像長寬比: %s || 折扣: %s' %
+                                   (item.Title, item.imageSize/1000, item.aspectRatio, item.discount)"/>
+      </li>
 <hr>
     </tal:repeat>
   </ol>
 </tal:catalog>
 
-
-
+<a tal:attributes="href python:'?start=%s&state=%s' % 
+                                    ((int(request.get('start', 0))-100) if int(request.get('start', 0))>100 else 0,
+                                      request.get('state', 'private'))">上一頁</a>
+<a tal:attributes="href python:'?start=%s&state=%s' % 
+                                    (int(request.get('start', 0))+100, request.get('state', 'private'))">下一頁</a>
 </body>
 </html>

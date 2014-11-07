@@ -53,4 +53,18 @@
     class=".browserview.GetProductList"
     />
 
+  <browser:page
+    for="*"
+    name="changeState"
+    permission="cmf.ManagePortal"
+    class=".browserview.ChangeState"
+    />
+
+  <browser:page
+    for="*"
+    name="change_subject"
+    permission="cmf.ManagePortal"
+    class=".browserview.ChangeSubject"
+    />
+
 </configure>
